@@ -30,11 +30,9 @@ flutter doctor
 ### 2. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_LECTURER_USERNAME/student_record_app.git
-cd student_record_app
+git clone https://github.com/Sopuru/prog1.git
+cd prog1
 ```
-
-> Replace `YOUR_LECTURER_USERNAME` with the actual GitHub username shared in class.
 
 ---
 
@@ -134,7 +132,7 @@ git push origin MIS-2021-042-Chidi-Okeke
 
 ### 10. Open a Pull Request
 
-1. Go to the GitHub repository in your browser
+1. Go to **https://github.com/Sopuru/prog1** in your browser
 2. Click **"Compare & pull request"** on your branch
 3. Set the title to: `MIS/2021/042 — Chidi Okeke: add student record`
 4. Click **"Create Pull Request"**
