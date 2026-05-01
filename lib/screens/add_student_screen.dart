@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/student.dart';
 
 class AddStudentScreen extends StatefulWidget {
-  const AddStudentScreen({super.key});
+  final Student? initialStudent; // added
 
+  const AddStudentScreen({super.key, this.initialStudent});
   @override
   State<AddStudentScreen> createState() => _AddStudentScreenState();
 }
@@ -13,7 +14,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
 
   final _studentNumCtrl = TextEditingController();
   final _nameCtrl = TextEditingController();
-  final _departmentCtrl = TextEditingController(text: 'Management Information Systems');
+  final _departmentCtrl = TextEditingController(
+    text: 'Management Information Systems',
+  );
   final _emailCtrl = TextEditingController();
   final _contributorCtrl = TextEditingController();
   final _gpaCtrl = TextEditingController();
@@ -22,6 +25,21 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   final List<String> _levels = ['100', '200', '300', '400', '500'];
 
   @override
+  void initState() {
+    super.initState();
+
+    final s = widget.initialStudent;
+    if (s != null) {
+      _studentNumCtrl.text = s.studentNumber;
+      _nameCtrl.text = s.name;
+      _departmentCtrl.text = s.department;
+      _gpaCtrl.text = s.gpa.toString();
+      _emailCtrl.text = s.email;
+      _contributorCtrl.text = s.contributedBy;
+      _selectedLevel = s.level;
+    }
+  }
+
   void dispose() {
     _studentNumCtrl.dispose();
     _nameCtrl.dispose();
@@ -36,7 +54,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final student = Student(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id:
+          widget.initialStudent?.id ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
       studentNumber: _studentNumCtrl.text.trim(),
       name: _nameCtrl.text.trim(),
       department: _departmentCtrl.text.trim(),
@@ -52,7 +72,11 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Add Student Record')),
+      appBar: AppBar(
+        title: Text(
+          widget.initialStudent != null ? 'Edit Student' : 'Add Student Record',
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Form(
@@ -65,21 +89,24 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 label: 'Student Number',
                 hint: 'e.g. MIS/2021/042',
                 icon: Icons.badge,
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
               _field(
                 controller: _nameCtrl,
                 label: 'Full Name',
                 hint: 'e.g. Chidi Okeke',
                 icon: Icons.person,
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
               _field(
                 controller: _departmentCtrl,
                 label: 'Department',
                 hint: 'Management Information Systems',
                 icon: Icons.account_balance,
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+                validator: (v) =>
+                    (v == null || v.trim().isEmpty) ? 'Required' : null,
               ),
               _levelDropdown(),
               _field(
@@ -87,7 +114,9 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 label: 'GPA (0.0 – 5.0)',
                 hint: 'e.g. 4.2',
                 icon: Icons.star,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 validator: (v) {
                   final n = double.tryParse(v ?? '');
                   if (n == null) return 'Enter a valid number';
@@ -101,14 +130,18 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                 hint: 'e.g. chidi@university.edu.ng',
                 icon: Icons.email,
                 keyboardType: TextInputType.emailAddress,
-                validator: (v) => (v == null || !v.contains('@')) ? 'Enter a valid email' : null,
+                validator: (v) => (v == null || !v.contains('@'))
+                    ? 'Enter a valid email'
+                    : null,
               ),
               _field(
                 controller: _contributorCtrl,
                 label: 'Your Student Number & Name',
                 hint: 'e.g. MIS/2021/042 — Chidi Okeke',
                 icon: Icons.edit,
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Required — identify yourself' : null,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Required — identify yourself'
+                    : null,
               ),
               const SizedBox(height: 24),
               ElevatedButton.icon(

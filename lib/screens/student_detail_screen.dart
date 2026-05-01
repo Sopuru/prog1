@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/student.dart';
+import 'add_student_screen.dart';
 
 class StudentDetailScreen extends StatelessWidget {
   final Student student;
   final VoidCallback onDelete;
+  final ValueChanged<Student>? onEdit; //added
 
   const StudentDetailScreen({
     super.key,
     required this.student,
     required this.onDelete,
+    this.onEdit, //added
   });
 
   @override
@@ -17,6 +20,23 @@ class StudentDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Student Details'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            tooltip: 'Edit record',
+            onPressed: () async {
+              final updated = await Navigator.push<Student>(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AddStudentScreen(initialStudent: student),
+                ),
+              );
+
+              if (updated != null) {
+                onEdit?.call(updated);
+                if (context.mounted) Navigator.pop(context);
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: 'Delete record',
@@ -37,7 +57,10 @@ class StudentDetailScreen extends StatelessWidget {
                         onDelete();
                         Navigator.pop(context);
                       },
-                      child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.red),
+                      ),
                     ),
                   ],
                 ),
@@ -52,7 +75,7 @@ class StudentDetailScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 48,
-              backgroundColor: Colors.indigo,
+              backgroundColor: Colors.teal,
               child: Text(
                 student.name.isNotEmpty ? student.name[0].toUpperCase() : '?',
                 style: const TextStyle(fontSize: 40, color: Colors.white),
@@ -61,11 +84,16 @@ class StudentDetailScreen extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               student.name,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 4),
-            Text(student.studentNumber, style: const TextStyle(color: Colors.grey)),
+            Text(
+              student.studentNumber,
+              style: const TextStyle(color: Colors.grey),
+            ),
             const SizedBox(height: 24),
             _infoCard(context),
             const SizedBox(height: 12),
@@ -83,12 +111,22 @@ class StudentDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Academic Info', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Academic Info',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
             const Divider(),
             _row(Icons.school, 'Department', student.department),
             _row(Icons.grade, 'Level', student.level),
             _row(Icons.star, 'GPA', student.gpa.toStringAsFixed(2)),
             _row(Icons.email, 'Email', student.email),
+            _row(
+              Icons.workspace_premium,
+              'Classification',
+              _gpaLabel(student.gpa),
+            ),
           ],
         ),
       ),
@@ -97,13 +135,18 @@ class StudentDetailScreen extends StatelessWidget {
 
   Widget _contributionCard(BuildContext context) {
     return Card(
-      color: Colors.indigo.shade50,
+      color: Colors.teal.shade50,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Contribution', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              'Contribution',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
             const Divider(),
             _row(Icons.person_pin, 'Added by', student.contributedBy),
           ],
@@ -117,7 +160,7 @@ class StudentDetailScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: Colors.indigo),
+          Icon(icon, size: 18, color: Colors.teal),
           const SizedBox(width: 10),
           Text('$label: ', style: const TextStyle(fontWeight: FontWeight.w600)),
           Expanded(child: Text(value, overflow: TextOverflow.ellipsis)),
@@ -125,4 +168,14 @@ class StudentDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+//added
+// ignore: unused_element
+String _gpaLabel(double gpa) {
+  if (gpa >= 4.5) return 'S Class';
+  if (gpa >= 3.5) return 'First Class';
+  if (gpa >= 2.4) return 'Second Class';
+  if (gpa >= 1.5) return 'Third Class';
+  return 'Pass';
 }
