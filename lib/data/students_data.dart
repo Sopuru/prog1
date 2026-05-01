@@ -48,6 +48,7 @@ final List<Student> sampleStudents = [
     contributedBy: 'MIS/2021/003 — Ngozi Adeyemi',
   ),
   const Student(
+ 2302060075-Zaidan-Mohammed
     id: '2302060075',
     studentNumber: 'MIS/424/2302060075',
     name: 'Zaidan mohammed',
@@ -57,4 +58,18 @@ final List<Student> sampleStudents = [
     email: 'zaidan.mohammed@final.edu.tr',
     contributedBy: 'MIS/2302/060/o75 — Zaidan mohammed',
   ),
+  
+    id: '2102-0600-27',
+    studentNumber: '2102060027',
+    name: 'Amadou Tyou',
+    department: 'Management Information Systems',
+    level: '400',
+    gpa: 2.8,
+    email: 'amadou.tyou@final.edu.tr',
+    contributedBy: '202060027 — Amadou Tyou',
+  ),
+
+  // ── STUDENT CONTRIBUTIONS BELOW THIS LINE ──────────────────────────────────
+  // TODO: Add your own Student entry here (see format above)
+  main
 ];
