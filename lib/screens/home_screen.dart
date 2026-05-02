@@ -1,3 +1,5 @@
+// ignore_for_file: unused_field
+
 import 'package:flutter/material.dart';
 import '../data/students_data.dart';
 import '../models/student.dart';
@@ -17,7 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Student> _filtered = [];
   final TextEditingController _searchController = TextEditingController();
   String _selectedLevel = 'All';
-
+  // ignore: prefer_final_fields
+  String _sortMode = 'none'; // none | name | gpa
   final List<String> _levels = ['All', '100', '200', '300', '400', '500'];
 
   @override
@@ -38,13 +41,19 @@ class _HomeScreenState extends State<HomeScreen> {
     final query = _searchController.text.toLowerCase();
     setState(() {
       _filtered = _students.where((s) {
-        final matchesSearch = s.name.toLowerCase().contains(query) ||
+        final matchesSearch =
+            s.name.toLowerCase().contains(query) ||
             s.studentNumber.toLowerCase().contains(query) ||
             s.department.toLowerCase().contains(query);
         final matchesLevel =
             _selectedLevel == 'All' || s.level == _selectedLevel;
         return matchesSearch && matchesLevel;
       }).toList();
+      if (_sortMode == 'name') {
+        _filtered.sort((a, b) => a.name.compareTo(b.name));
+      } else if (_sortMode == 'gpa') {
+        _filtered.sort((a, b) => b.gpa.compareTo(a.gpa));
+      }
     });
   }
 
@@ -68,7 +77,100 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // ignore: unused_element - i tried a quick fixed directly with vscode
+  void _editStudent(Student updated) {
+    setState(() {
+      final index = _students.indexWhere((s) => s.id == updated.id);
+      if (index != -1) {
+        _students[index] = updated; // 🔁 remplace l'ancien student
+      }
+      _applyFilters();
+    });
+  }
+
   @override
+  //added
+  Widget _buildStatsBanner() {
+    final total = _filtered.length;
+
+    final avgGpa = total == 0
+        ? 0.0
+        : _filtered.map((s) => s.gpa).reduce((a, b) => a + b) / total;
+
+    final topGpa = total == 0
+        ? 0.0
+        : _filtered.map((s) => s.gpa).reduce((a, b) => a > b ? a : b);
+
+    return Container(
+      margin: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.teal.shade50,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _stat('Students', '$total'),
+          _stat('Avg GPA', avgGpa.toStringAsFixed(2)),
+          _stat('Top GPA', topGpa.toStringAsFixed(2)),
+          Row(
+            children: [
+              _sortBtn('Name', 'name'),
+              const SizedBox(width: 4),
+              _sortBtn('GPA', 'gpa'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _stat(String label, String value) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: Colors.teal,
+          ),
+        ),
+        Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _sortBtn(String label, String mode) {
+    final selected = _sortMode == mode;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _sortMode = selected ? 'none' : mode;
+          _applyFilters();
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? Colors.teal : Colors.white,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: Colors.teal),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 11,
+            color: selected ? Colors.white : Colors.teal,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -89,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _buildSearchBar(),
           _buildLevelFilter(),
+          _buildStatsBanner(),
           Expanded(
             child: _filtered.isEmpty
                 ? const Center(
@@ -110,6 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             builder: (_) => StudentDetailScreen(
                               student: student,
                               onDelete: () => _deleteStudent(student.id),
+                              onEdit: _editStudent, // Added
                             ),
                           ),
                         ),
@@ -129,7 +233,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         icon: const Icon(Icons.person_add),
         label: const Text('Add Student'),
-        backgroundColor: Colors.indigo,
+        backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
       ),
     );
@@ -163,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         itemCount: _levels.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        separatorBuilder: (_, _) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final level = _levels[index];
           final selected = level == _selectedLevel;
@@ -171,11 +275,10 @@ class _HomeScreenState extends State<HomeScreen> {
             label: Text(level == 'All' ? 'All Levels' : 'Level $level'),
             selected: selected,
             onSelected: (_) => _onLevelChanged(level),
-            selectedColor: Colors.indigo,
+            selectedColor: Colors.teal,
             labelStyle: TextStyle(
               color: selected ? Colors.white : Colors.black87,
-              fontWeight:
-                  selected ? FontWeight.bold : FontWeight.normal,
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
             ),
           );
         },
