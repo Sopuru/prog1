@@ -14,6 +14,15 @@ class StudentCard extends StatelessWidget {
     return Colors.red;
   }
 
+  // ignore: unused_element
+  String _gpaLabel(double gpa) {
+    if (gpa >= 4.5) return 'S Class';
+    if (gpa >= 3.5) return 'First Class';
+    if (gpa >= 2.4) return 'Second Class';
+    if (gpa >= 1.5) return 'Third Class';
+    return 'Pass';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -21,17 +30,23 @@ class StudentCard extends StatelessWidget {
       child: ListTile(
         onTap: onTap,
         leading: CircleAvatar(
-          backgroundColor: Colors.indigo,
+          backgroundColor: Colors.teal,
           child: Text(
             student.name.isNotEmpty ? student.name[0].toUpperCase() : '?',
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-        title: Text(student.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          student.name,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         subtitle: Text('${student.studentNumber} • ${student.department}'),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
+        trailing: Wrap(
+          direction: Axis.vertical,
+          crossAxisAlignment: WrapCrossAlignment.end,
           children: [
             Text(
               'GPA: ${student.gpa.toStringAsFixed(1)}',
@@ -43,6 +58,24 @@ class StudentCard extends StatelessWidget {
             Text(
               'Level ${student.level}',
               style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            Container(
+              //added
+              margin: const EdgeInsets.only(top: 5, left: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: _gpaColor(student.gpa).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(3),
+                border: Border.all(color: _gpaColor(student.gpa), width: 0.8),
+              ),
+              child: Text(
+                _gpaLabel(student.gpa),
+                style: TextStyle(
+                  fontSize: 8,
+                  color: _gpaColor(student.gpa),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ],
         ),

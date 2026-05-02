@@ -47,6 +47,9 @@ final List<Student> sampleStudents = [
     email: 'ngozi.adeyemi@university.edu.ng',
     contributedBy: 'MIS/2021/003 — Ngozi Adeyemi',
   ),
+
+  // ── STUDENT CONTRIBUTIONS BELOW THIS LINE ──────────────────────────────────
+  // TODO: Add your own Student entry here (see format above)
   const Student(
  2302060075-Zaidan-Mohammed
     id: '2302060075',
@@ -68,8 +71,4 @@ final List<Student> sampleStudents = [
     email: 'amadou.tyou@final.edu.tr',
     contributedBy: '202060027 — Amadou Tyou',
   ),
-
-  // ── STUDENT CONTRIBUTIONS BELOW THIS LINE ──────────────────────────────────
-  // TODO: Add your own Student entry here (see format above)
-  main
-];
+;
